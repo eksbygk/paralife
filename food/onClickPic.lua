@@ -43,6 +43,21 @@ local picToLight = {
     ["blocktemplates/d24.bmax"] = "blocktemplates/d32.bmax"
 }
 
+-- function changePicTag(entity)
+
+-- end
+
+function checkPic(entity)
+    local pincNameHead = string.sub(entity:GetName(), 1, 5)
+    for i = 1, 8 do
+        local picEntity = GetEntity(pincNameHead .. i)
+        if picEntity.tag ~= i then
+            return false
+        end
+    end
+    return true
+end
+
 registerBroadcastEvent("onClickPic", function(msg)
     msg = commonlib.totable(msg)
     local entity = GetEntity(msg.name)
@@ -52,16 +67,17 @@ registerBroadcastEvent("onClickPic", function(msg)
             entity:SetModelFile(picToDark[file])
         end
         wait(0.05)
-
         if clickTime >= 2 then
             clickTime = 1
         else
             clickTime = clickTime + 1
         end
-
         if clickTime == 1 then
             fristEntity = entity
         elseif clickTime == 2 then
+            -- 交换tag，使用tag来判断是否复原拼图
+            entity.tag, fristEntity.tag = fristEntity.tag, entity.tag
+
             local file = entity:GetModelFile()
             if picToLight[file] then
                 entity:SetModelFile(picToLight[file])
@@ -71,16 +87,17 @@ registerBroadcastEvent("onClickPic", function(msg)
                 fristEntity:SetModelFile(picToLight[fristFile])
             end
             wait(0.05)
-
             local x1, y1, z1 = fristEntity:GetPosition()
             local x2, y2, z2 = entity:GetPosition()
             for i = 1, 10 do
-                fristEntity:SetPosition(x1 + (x2 - x1) / 10 * i, y2,
-                                        z1 + (z2 - z1) / 10 * i)
-                entity:SetPosition(x2 + (x1 - x2) / 10 * i, y1,
-                                   z2 + (z1 - z2) / 10 * i)
+                fristEntity:SetPosition(x1 + (x2 - x1) / 10 * i, y2, z1 + (z2 - z1) / 10 * i)
+                entity:SetPosition(x2 + (x1 - x2) / 10 * i, y1, z2 + (z1 - z2) / 10 * i)
                 wait(0.01)
             end
+        end
+        -- print(checkPic(entity))
+        if checkPic(entity) then
+            tip("成功复原")
         end
     end
 end)
