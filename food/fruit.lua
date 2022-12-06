@@ -1,6 +1,5 @@
 local dollMac = GetEntity("20221103T083228.561075-93")
-local x, y, z = dollMac.block_container.x, dollMac.block_container.y,
-                dollMac.block_container.z
+local x, y, z = dollMac.block_container.x, dollMac.block_container.y, dollMac.block_container.z
 -- print(dollMac.block_container)
 
 -- setPos(x+1.2, y+2, z+1.6) --zuoshangjiao

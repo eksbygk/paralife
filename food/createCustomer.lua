@@ -10,70 +10,108 @@ local foodTable = {
     {
         index = 1,
         name = "煎肉",
-        file = "blocktemplates/b31.bmax"
+        dialog = "blocktemplates/f32.bmax",
+        file = "blocktemplates/b31.bmax",
+        text = "我想要一盘烤牛排"
     }, {
         index = 2,
         name = "煎蛋",
-        file = "blocktemplates/b26.bmax"
+        dialog = "blocktemplates/f33.bmax",
+        file = "blocktemplates/b26.bmax",
+        text = "我想要一盘香煎荷包蛋"
     }, {
         index = 3,
         name = "蔬果沙拉",
-        file = "blocktemplates/c20.bmax"
+        dialog = "blocktemplates/f30.bmax",
+        file = "blocktemplates/f23.bmax",
+        text = "我想要一盘蔬菜沙拉"
     }, {
         index = 4,
         name = "牛奶",
-        file = "blocktemplates/f9.bmax"
+        dialog = "blocktemplates/f31.bmax",
+        file = "blocktemplates/f9.bmax",
+        text = "我想要一杯牛奶"
     }
 }
 
 local checkFoodTable = {
     ["blocktemplates/b31.bmax"] = {
-        index = 1
+        index = 1,
+        price = 20
     },
     ["blocktemplates/b26.bmax"] = {
-        index = 2
+        index = 2,
+        price = 15
     },
-    ["blocktemplates/c20.bmax"] = {
-        index = 3
+    ["blocktemplates/f23.bmax"] = {
+        index = 3,
+        price = 17
     },
     ["blocktemplates/f9.bmax"] = {
-        index = 4
+        index = 4,
+        price = 13
     }
 }
+
+-- 每次打开世界清除上一次的顾客与对话框
+for i = 0, 4 do
+    local customer = GetEntity("food_customer_" .. i)
+    if customer then
+        customer:Destroy()
+    end
+    local dialog = GetEntity("food_customer_" .. i .. "_dialog")
+    if dialog then
+        dialog:Destroy()
+    end
+    wait(0.01)
+end
 
 function createCustomer()
     local customer = GetEntity(customerFiles[math.random(1, #customerFiles)])
     local posIndex = math.random(1, #customerPos)
     local foodIndex = math.random(1, #foodTable)
-    local newCustomer = customer:CloneMe()
-    -- broadcast("createFood", customerPos[posIndex])
-    newCustomer:SetPosition(x, y, z - 1.5 * customerPos[posIndex])
-    newCustomer.tag = {
-        pos = customerPos[posIndex],
-        food = foodIndex
-    }
-    newCustomer:Say(foodTable[foodIndex].name, 9999)
-    newCustomer:SetOnClickEvent("onClickCustomer") -- 上线前删掉这句！
-    newCustomer:SetOnMountEvent("onMountCustomer")
-    table.remove(customerPos, posIndex)
+
+    local newCustomerName = "food_customer_" .. customerPos[posIndex]
+    local newCustomer = GetEntity(newCustomerName)
+    if not newCustomer then
+        newCustomer = customer:CloneMe()
+        newCustomer:SetName(newCustomerName)
+        newCustomer:SetPosition(x, y, z - 1.5 * customerPos[posIndex])
+        newCustomer.tag = {
+            pos = customerPos[posIndex],
+            food = foodIndex
+        }
+        -- 创建人物头顶气泡 (dialog)
+        local dialog = GetEntity(newCustomerName .. "_dialog")
+        if dialog then
+            dialog:Destroy()
+        end
+        dialog = newCustomer:CloneMe()
+        dialog:SetName(newCustomerName .. "_dialog")
+        dialog:SetModelFile(foodTable[foodIndex].dialog)
+        dialog:SetOnClickEvent(nil)
+        dialog:SetOnMountEvent(nil)
+        dialog:SetFacing(90 * math.pi / 180)
+        dialog:SetScaling(1.4)
+        dialog:SetPitch(1.5 * math.pi)
+        dialog:SetPosition(x, y + 3, z - 1.5 * customerPos[posIndex])
+
+        newCustomer:SetOnClickEvent("onClickCustomer")
+        newCustomer:SetOnMountEvent("onMountCustomer")
+        table.remove(customerPos, posIndex)
+    end
 end
 
 for i = 1, 3 do
     createCustomer()
-    -- 手动延迟，广播接收有问题
-    -- wait(0.1)
 end
 
--- 上线前删掉这个方法！
 registerBroadcastEvent("onClickCustomer", function(msg)
     msg = commonlib.totable(msg)
     local entity = GetEntity(msg.name)
     if entity then
-        -- table.insert(customerPos, entity.tag.pos)
-        -- entity.tag = nil
-        entity:Destroy()
-        -- wait(1)
-        -- createCustomer()
+        local foodIndex = entity.tag.food
+        playText(foodTable[foodIndex].text, nil, 10005)
     end
 end)
 
@@ -124,17 +162,20 @@ registerBroadcastEvent("onMountCustomer", function(msg)
         local file = mountedEntity:GetModelFile()
         if checkFoodTable[file] and checkFoodTable[file].index == entity.tag.food then
             table.insert(customerPos, entity.tag.pos)
-            -- broadcast("deleteFood", entity.tag)
+            broadcast("getMoney", checkFoodTable[file].price)
+            tip("收入 " .. checkFoodTable[file].price .. "元")
             entity.tag = nil
             entity:Say("正确", 1)
         else
             entity:Say("错误，不会再光顾", 1)
 
         end
-        wait(1.5)
-        entity:Destroy()
-        mountedEntity:Destroy()
+        local dialog = GetEntity(msg.name .. "_dialog")
         wait(1)
+        entity:Destroy()
+        dialog:Destroy()
+        mountedEntity:Destroy()
+        wait(0.5)
         createCustomer()
     end
 end)

@@ -19,13 +19,27 @@ local fruitsSimple = {
     }
 }
 
+local dialogHtml = [[
+    <div style="width:888px;height:303px;background: url(images/dialog/m7.png)">
+    </div>
+]]
+local dialog = window(dialogHtml, "_ctb", 0, -50, 888, 300)
+dialog:SetDesignResolution(1800, 300)
+dialog:hide()
+dialog:registerEvent("onmouseup", function(event)
+    if event:button() == "left" then
+        dialog:hide()
+    end
+end)
+
 registerBroadcastEvent("onClickShelves", function(msg)
     msg = commonlib.totable(msg)
     local entity = GetEntity(msg.name)
     if entity then
         -- 掉落次数
-        local time = entity.tag or 4
+        local time = entity.tag or 2
         if time > 0 then
+            playSound("music/shake.mp3")
             local x, y, z = entity:GetPosition()
             local dir = 1
             for i = 1, 4 do
@@ -45,13 +59,14 @@ registerBroadcastEvent("onClickShelves", function(msg)
                 fruit.tag = nil
                 fruit:SetOnMountEvent("onMountFruit")
                 fruit:EnableDynamicPhysics(true)
-                fruit:SetPosition(x + math.random(0, 1) * 4 - 2, y + 3,
-                                  z + math.random(-2, 2))
+                fruit:SetPosition(x + math.random(0, 1) * 4 - 2, y + 2, z + math.random(-2, 2))
             end
             time = time - 1
             entity.tag = time
         else
-            tip("货架上没有水果了!")
+            -- tip("货架上已经没有水果可以提供了呢!")
+            dialog:show()
+            playText("货架上已经没有水果可以提供了呢", nil, 10005)
         end
 
     end

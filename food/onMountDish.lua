@@ -18,12 +18,12 @@ local foodTable = {
         -- 番茄片
         [foodFile["tomato"]] = {
             file = foodFile["dishWithTomato"],
-            size = 2
+            size = 1.8
         },
         -- 生菜片
         [foodFile["lettuce"]] = {
             file = foodFile["dishWithLettuce"],
-            size = 2
+            size = 1.8
         },
         -- 煎蛋
         [foodFile["friedEgg"]] = {
@@ -33,7 +33,7 @@ local foodTable = {
         -- 烤肉 熟
         [foodFile["roast"]] = {
             file = foodFile["dishWithRoast"],
-            size = 2
+            size = 1.8
         }
     },
     -- 有番茄片的餐盘
@@ -41,7 +41,7 @@ local foodTable = {
         -- 生菜片
         [foodFile["lettuce"]] = {
             file = foodFile["dishWithSalad"],
-            size = 2
+            size = 1.8
         }
     },
     -- 有生菜片的餐盘
@@ -49,7 +49,7 @@ local foodTable = {
         -- 番茄片
         [foodFile["tomato"]] = {
             file = foodFile["dishWithSalad"],
-            size = 2
+            size = 1.8
         }
     }
 }

@@ -6,8 +6,7 @@ registerBroadcastEvent("onClickEvent", function(msg)
     end
 end)
 
-html =
-    [[<div style="width: 1834px;height: 337px;background: url(images/dialog3-0.png);">
+html = [[<div style="width: 1834px;height: 337px;background: url(images/dialog3-0.png);">
         <div style="margin-top: 200px;margin-left: 500px;width:1134px;height:28px;background: url(images/dialog3-3.png);"></div>
     </div>]]
 
@@ -61,7 +60,7 @@ registerBroadcastEvent("onMountEvent", function(msg)
         mountedEntity:SetOnClickEvent(nil)
         mountedEntity:SetOnMountEvent(nil)
         mountedEntity:SetCanDrag(false)
-        mountedEntity:EnablePhysics(false)
+        mountedEntity:EnablePhysics(false) -- 物理模型
         mountedEntity:SetScaling(1)
         mountedEntity:SetFacing(mountedEntity:GetFacing() + math.pi)
         mountedEntity:SetFacing(95 * 3.14 / 180)

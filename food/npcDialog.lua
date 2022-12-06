@@ -1,4 +1,5 @@
 local talkedNpc = 0
+local isGetStar = false
 local isFristTalk = {}
 
 for i = 1, 7 do
@@ -17,7 +18,8 @@ end
 local dialogWnds = {}
 
 for i = 1, 7 do
-    dialogWnds[i] = window(getHtml(i), "_ct", -444, -150, 888, 300)
+    dialogWnds[i] = window(getHtml(i), "_ct", -444, 100, 888, 300)
+    dialogWnds[i]:SetDesignResolution(1600, 300)
     dialogWnds[i]:hide()
     dialogWnds[i]:registerEvent("onmouseup", function(event)
         if event:button() == "left" then
@@ -26,7 +28,8 @@ for i = 1, 7 do
                 talkedNpc = talkedNpc + 1
             end
             isFristTalk[i] = true
-            if talkedNpc == 7 then
+            if not isGetStar and talkedNpc >= 7 then
+                isGetStar = true
                 broadcast("playGetStar")
                 -- 7位npc全部对话完毕 获得三颗星星
                 broadcast("getMultipleSatr", 3)

@@ -97,7 +97,16 @@ registerBroadcastEvent("onClickPic", function(msg)
         end
         -- print(checkPic(entity))
         if checkPic(entity) then
+            local style = string.sub(msg.name, 4, 4)
+            broadcast("finishPic", style)
             tip("成功复原")
+            wait(1)
+            broadcast("playGetStar")
+            broadcast("getMultipleSatr", 2)
+            setBlock(19158, 3, 19167, 0)
+            camera(8, 20, 90)
+            wait(3)
+            setBlock(19158, 3, 19167, 192)
         end
     end
 end)
